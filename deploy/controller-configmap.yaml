@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: overlay-ip-controller-config
+data:
+  overlay-ip-config.yaml: |
+    phpIPAM:
+      url: http://phpipam
+      appID: iks
+      subnetMap:
+        dal10:
+        - 7

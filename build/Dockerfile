@@ -1,0 +1,17 @@
+FROM {ARG_FROM}
+
+RUN microdnf install -y iproute
+
+ENV OPERATOR=/usr/local/bin/{ARG_BIN} \
+    USER_UID=0 \
+    USER_NAME=iks-overlay-ip-controller
+
+# install operator binary
+ADD bin/{ARG_OS}_{ARG_ARCH}/{ARG_BIN} /usr/local/bin/{ARG_BIN}
+
+COPY build/bin /usr/local/bin
+RUN  /usr/local/bin/user_setup
+
+ENTRYPOINT ["/usr/local/bin/entrypoint"]
+
+USER ${USER_UID}

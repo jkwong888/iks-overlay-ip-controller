@@ -1,0 +1,37 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: overlay-ip-controller
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - pods
+  - configmaps
+  verbs:
+  - '*'
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - servicemonitors
+  verbs:
+  - get
+  - create
+- apiGroups:
+  - apps
+  resourceNames:
+  - overlay-ip-controller
+  resources:
+  - deployments/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - iks.ibm.com
+  resources:
+  - '*'
+  - staticroutes
+  - connectedsubnets
+  verbs:
+  - '*'

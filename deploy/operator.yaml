@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: overlay-ip-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: overlay-ip-controller
+  template:
+    metadata:
+      labels:
+        name: overlay-ip-controller
+    spec:
+      serviceAccountName: overlay-ip-controller
+      containers:
+        - name: overlay-ip-controller
+          # Replace this with the built image name
+          image: jkwong/overlay-network-controller:latest
+          imagePullPolicy: Always
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "overlay-ip-controller"
+            - name: INTERFACE
+              value: "eth0"
+            - name: INTERFACE_LABEL
+              value: "tmp0"
+            - name: PHPIPAM_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: phpipam-secret
+                  key: username
+            - name: PHPIPAM_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: phpipam-secret
+                  key: password
+          volumeMounts:
+          - name: controller-config
+            mountPath: /opt/controller-config
+      volumes:  
+      - name: controller-config
+        configMap:
+          name: overlay-ip-controller-config

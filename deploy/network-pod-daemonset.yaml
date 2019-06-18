@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: overlay-network-pod
+spec:
+  selector:
+    matchLabels:
+      name: overlay-network-pod
+  template:
+    metadata:
+      labels:
+        name: overlay-network-pod
+    spec:
+      serviceAccountName: iks-overlay-ip-controller 
+      hostNetwork: true
+      containers:
+      - name: overlay-network-pod
+        image: jkwong/network-pod:latest
+        imagePullPolicy: Always
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+        env:
+        - name: OPERATOR_NAME
+          value: "overlay-network-pod"
+        - name: NODE_HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: INTERFACE
+          value: "eth0"
+        - name: INTERFACE_LABEL
+          value: "tmp0"
+
+
