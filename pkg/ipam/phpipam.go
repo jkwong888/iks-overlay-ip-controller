@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"crypto/tls"
 
 	"gopkg.in/yaml.v2"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
@@ -24,6 +25,7 @@ type PhpIPAMConfigSpec struct {
 	username *string `yaml:"username"`
 	password *string `yaml:"password"`
 
+	InsecureSkipTLSVerify bool `yaml:"insecureSkipTLSVerify"`
 	URL   *string `yaml:"url"`
 	AppID *string `yaml:"appID"`
 
@@ -93,8 +95,13 @@ func NewPhpIPAM() (*PhpIPAM, error) {
 }
 
 func (p *PhpIPAM) callAPI(httpVerb string, path string, params map[string]string) (*phpIPAMResponse, error) {
+	tr := &http.Transport{
+        TLSClientConfig: &tls.Config{InsecureSkipVerify: p.PhpIPAMConfig.InsecureSkipTLSVerify},
+	}
+
 	var httpClient = &http.Client{
 		Timeout: time.Second * 10,
+		Transport: tr,
 	}
 
 	var sb strings.Builder
@@ -137,8 +144,13 @@ func (p *PhpIPAM) callAPI(httpVerb string, path string, params map[string]string
 }
 
 func (p *PhpIPAM) getToken() error {
+	tr := &http.Transport{
+        TLSClientConfig: &tls.Config{InsecureSkipVerify: p.PhpIPAMConfig.InsecureSkipTLSVerify},
+	}
+
 	var httpClient = &http.Client{
 		Timeout: time.Second * 10,
+		Transport: tr,
 	}
 
 	request, err := http.NewRequest(http.MethodPost,
